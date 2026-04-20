@@ -1,6 +1,6 @@
 {
-  "name": "reFaust",
-  "version": "1.13.3",
+  "name": "FaustAI",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "prepare": "husky",
@@ -9,7 +9,7 @@
     "build:android": "cd android && ./gradlew assembleDebug && cd ..",
     "build:android:release": "cd android && ./gradlew bundleRelease && cd ..",
     "clean:android": "cd android && ./gradlew clean && cd ..",
-    "clean": "yarn clean:ios && yarn clean:android",
+    "clean": "yarn clean:android",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "l10n:validate": "node scripts/validate-l10n.js",
@@ -114,11 +114,11 @@
   },
   "packageManager": "yarn@1.22.22",
   "codegenConfig": {
-    "name": "reFaust",
+    "name": "FaustAI",
     "type": "all",
     "jsSrcsDir": "src/specs",
     "android": {
-      "javaPackageName": "com.pocketpal.specs"
+      "javaPackageName": "com.faust.ai.specs"
     }
   }
 }
