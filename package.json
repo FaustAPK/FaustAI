@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prepare": "husky",
+    "prepare": "echo 'Skipping husky'",
     "postinstall": "echo 'Skipping postinstall'",
     "android": "react-native run-android",
     "build:android": "cd android && ./gradlew assembleDebug && cd ..",
