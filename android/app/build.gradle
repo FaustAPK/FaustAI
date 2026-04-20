@@ -14,53 +14,7 @@ apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
  * Этот блок конфигурации предназначен для кастомизации вашего React Native Android приложения.
  * По умолчанию вам не нужно применять никакой конфигурации, просто раскомментируйте нужные строки.
  */
-react {
-    /* Папки */
-    //   Корень вашего проекта, где находится "package.json". По умолчанию: '../..'
-    // root = file("../../")
-    //   Папка, где находится NPM-пакет react-native. По умолчанию: ../../node_modules/react-native
-    // reactNativeDir = file("../../node_modules/react-native")
-    //   Папка, где находится пакет Codegen для react-native. По умолчанию: ../../node_modules/@react-native/codegen
-    // codegenDir = file("../../node_modules/@react-native/codegen")
-    //   Файл cli.js, который является точкой входа для React Native CLI. По умолчанию: ../../node_modules/react-native/cli.js
-    // cliFile = file("../../node_modules/react-native/cli.js")
 
-    /* Варианты (flavors) */
-    //   Список вариантов, которые доступны для отладки. Для них мы пропустим этапы сборки JS-бандла и ресурсов.
-    //   По умолчанию это просто 'debug'.
-    //   Если вы добавляете варианты (flavors), такие как lite, prod и т.д., вам нужно будет перечислить ваши отлаживаемые варианты.
-    // debuggableVariants = ["liteDebug", "prodDebug"]
-
-    /* Сборка бандла */
-    //   Список, содержащий команду node и её флаги. По умолчанию: ['node'].
-    // nodeExecutableAndArgs = ["node"]
-    //
-    //   Команда для запуска сборки бандла. По умолчанию: 'bundle'
-    // bundleCommand = "ram-bundle"
-    //
-    //   Путь к файлу конфигурации CLI. По умолчанию пусто.
-    // bundleConfig = file(../rn-cli.config.js)
-    //
-    //   Имя генерируемого файла ресурсов, содержащего ваш JS-бандл.
-    // bundleAssetName = "MyApplication.android.bundle"
-    //
-    //   Входной файл для генерации бандла. По умолчанию: 'index.android.js' или 'index.js'
-    // entryFile = file("../js/MyApplication.android.js")
-    //
-    //   Список дополнительных флагов для передачи командам 'bundle'.
-    //   См. https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
-    // extraPackagerArgs = []
-
-    /* Команды для Hermes */
-    //   Команда компилятора hermes для запуска. По умолчанию: 'hermesc'
-    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
-    //
-    //   Список флагов для передачи компилятору Hermes. По умолчанию: ["-O", "-output-source-map"]
-    // hermesFlags = ["-O", "-output-source-map"]
-
-    /* Автоподключение библиотек */
-    autolinkLibrariesWithApp()
-}
 
 /**
  * Установите значение true, чтобы запустить Proguard для релизных сборок для минификации Java байт-кода.
