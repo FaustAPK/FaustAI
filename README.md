@@ -37,7 +37,6 @@
 3. Выберите workflow **Build Android APK**.
 4. Нажмите **Run workflow** → **Run workflow**.
 5. Через 5–10 минут скачайте APK из раздела **Artifacts**.
-6. 
 
 Либо соберите локально (требуется Android SDK и Node.js 18+):
 ```bash
