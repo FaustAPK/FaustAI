@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 
 import Clipboard from '@react-native-clipboard/clipboard';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+// import ReactNativeHapticFeedback from 'react-native-haptic-feedback'; // Удалено
 
 import {CopyIcon} from '../../assets/icons';
 
@@ -15,10 +15,10 @@ interface CodeBlockHeaderProps {
   content: string;
 }
 
-const hapticOptions = {
-  enableVibrateFallback: true,
-  ignoreAndroidSystemSettings: false,
-};
+// const hapticOptions = {
+//   enableVibrateFallback: true,
+//   ignoreAndroidSystemSettings: false,
+// };
 
 export const CodeBlockHeader: React.FC<CodeBlockHeaderProps> = ({
   language,
@@ -28,7 +28,7 @@ export const CodeBlockHeader: React.FC<CodeBlockHeaderProps> = ({
   const styles = createStyles(theme);
 
   const handleCopy = () => {
-    ReactNativeHapticFeedback.trigger('impactLight', hapticOptions);
+    // ReactNativeHapticFeedback.trigger('impactLight', hapticOptions); // Удалено
     Clipboard.setString(content.trim());
   };
 
