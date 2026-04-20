@@ -1,7 +1,7 @@
 import {makeAutoObservable, runInAction} from 'mobx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makePersistable} from 'mobx-persist-store';
-import * as Keychain from 'react-native-keychain';
+// import * as Keychain from 'react-native-keychain'; // Удалено
 
 import {fetchGGUFSpecs, fetchModelFilesDetails, fetchModels} from '../api/hf';
 
@@ -52,26 +52,26 @@ class HFStore {
       storage: AsyncStorage,
     });
 
-    // Load token from secure storage on initialization
-    this.loadTokenFromSecureStorage();
+    // Load token from secure storage on initialization (disabled)
+    // this.loadTokenFromSecureStorage(); // Удалено
   }
 
-  // Load token from secure storage
-  private async loadTokenFromSecureStorage() {
-    try {
-      const credentials = await Keychain.getGenericPassword({
-        service: HF_TOKEN_SERVICE,
-      });
-
-      if (credentials) {
-        runInAction(() => {
-          this.hfToken = credentials.password;
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load token from secure storage:', error);
-    }
-  }
+  // Load token from secure storage (disabled)
+  // private async loadTokenFromSecureStorage() {
+  //   try {
+  //     const credentials = await Keychain.getGenericPassword({
+  //       service: HF_TOKEN_SERVICE,
+  //     });
+  //
+  //     if (credentials) {
+  //       runInAction(() => {
+  //         this.hfToken = credentials.password;
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to load token from secure storage:', error);
+  //   }
+  // }
 
   get isTokenPresent(): boolean {
     return !!this.hfToken && this.hfToken.trim().length > 0;
@@ -89,10 +89,10 @@ class HFStore {
 
   async setToken(token: string) {
     try {
-      // Save token in secure storage
-      await Keychain.setGenericPassword('hf_token', token, {
-        service: HF_TOKEN_SERVICE,
-      });
+      // Save token (disabled)
+      // await Keychain.setGenericPassword('hf_token', token, {
+      //   service: HF_TOKEN_SERVICE,
+      // });
 
       runInAction(() => {
         this.hfToken = token;
@@ -106,10 +106,10 @@ class HFStore {
 
   async clearToken() {
     try {
-      // Remove token from secure storage
-      await Keychain.resetGenericPassword({
-        service: HF_TOKEN_SERVICE,
-      });
+      // Remove token (disabled)
+      // await Keychain.resetGenericPassword({
+      //   service: HF_TOKEN_SERVICE,
+      // });
 
       runInAction(() => {
         this.hfToken = null;
