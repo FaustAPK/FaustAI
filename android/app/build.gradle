@@ -3,80 +3,80 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "org.jetbrains.kotlin.kapt"
 apply plugin: "com.facebook.react"
 
-// Add the Google Services plugin dependency
-// This is used exclusively for sending benchmarks (with user consent) to Hugging Face Spaces via Firebase.
-// Firebase is used for App Check functionality, allowing unauthenticated users to submit their benchmark data securely.
+// Добавляем плагин сервисов Google Play
+// Он используется исключительно для отправки результатов бенчмарков (с согласия пользователя) в Hugging Face Spaces через Firebase.
+// Firebase используется для функциональности App Check, позволяя неавторизованным пользователям безопасно отправлять свои данные бенчмарков.
 apply plugin: "com.google.gms.google-services"
 
 apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
 
 /**
- * This is the configuration block to customize your React Native Android app.
- * By default you don't need to apply any configuration, just uncomment the lines you need.
+ * Этот блок конфигурации предназначен для кастомизации вашего React Native Android приложения.
+ * По умолчанию вам не нужно применять никакой конфигурации, просто раскомментируйте нужные строки.
  */
 react {
-    /* Folders */
-    //   The root of your project, i.e. where "package.json" lives. Default is '../..'
+    /* Папки */
+    //   Корень вашего проекта, где находится "package.json". По умолчанию: '../..'
     // root = file("../../")
-    //   The folder where the react-native NPM package is. Default is ../../node_modules/react-native
+    //   Папка, где находится NPM-пакет react-native. По умолчанию: ../../node_modules/react-native
     // reactNativeDir = file("../../node_modules/react-native")
-    //   The folder where the react-native Codegen package is. Default is ../../node_modules/@react-native/codegen
+    //   Папка, где находится пакет Codegen для react-native. По умолчанию: ../../node_modules/@react-native/codegen
     // codegenDir = file("../../node_modules/@react-native/codegen")
-    //   The cli.js file which is the React Native CLI entrypoint. Default is ../../node_modules/react-native/cli.js
+    //   Файл cli.js, который является точкой входа для React Native CLI. По умолчанию: ../../node_modules/react-native/cli.js
     // cliFile = file("../../node_modules/react-native/cli.js")
 
-    /* Variants */
-    //   The list of variants to that are debuggable. For those we're going to
-    //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
-    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
+    /* Варианты (flavors) */
+    //   Список вариантов, которые доступны для отладки. Для них мы пропустим этапы сборки JS-бандла и ресурсов.
+    //   По умолчанию это просто 'debug'.
+    //   Если вы добавляете варианты (flavors), такие как lite, prod и т.д., вам нужно будет перечислить ваши отлаживаемые варианты.
     // debuggableVariants = ["liteDebug", "prodDebug"]
 
-    /* Bundling */
-    //   A list containing the node command and its flags. Default is just 'node'.
+    /* Сборка бандла */
+    //   Список, содержащий команду node и её флаги. По умолчанию: ['node'].
     // nodeExecutableAndArgs = ["node"]
     //
-    //   The command to run when bundling. By default is 'bundle'
+    //   Команда для запуска сборки бандла. По умолчанию: 'bundle'
     // bundleCommand = "ram-bundle"
     //
-    //   The path to the CLI configuration file. Default is empty.
+    //   Путь к файлу конфигурации CLI. По умолчанию пусто.
     // bundleConfig = file(../rn-cli.config.js)
     //
-    //   The name of the generated asset file containing your JS bundle
+    //   Имя генерируемого файла ресурсов, содержащего ваш JS-бандл.
     // bundleAssetName = "MyApplication.android.bundle"
     //
-    //   The entry file for bundle generation. Default is 'index.android.js' or 'index.js'
+    //   Входной файл для генерации бандла. По умолчанию: 'index.android.js' или 'index.js'
     // entryFile = file("../js/MyApplication.android.js")
     //
-    //   A list of extra flags to pass to the 'bundle' commands.
-    //   See https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
+    //   Список дополнительных флагов для передачи командам 'bundle'.
+    //   См. https://github.com/react-native-community/cli/blob/main/docs/commands.md#bundle
     // extraPackagerArgs = []
 
-    /* Hermes Commands */
-    //   The hermes compiler command to run. By default it is 'hermesc'
+    /* Команды для Hermes */
+    //   Команда компилятора hermes для запуска. По умолчанию: 'hermesc'
     // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
     //
-    //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
+    //   Список флагов для передачи компилятору Hermes. По умолчанию: ["-O", "-output-source-map"]
     // hermesFlags = ["-O", "-output-source-map"]
 
-    /* Autolinking */
+    /* Автоподключение библиотек */
     autolinkLibrariesWithApp()
 }
 
 /**
- * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ * Установите значение true, чтобы запустить Proguard для релизных сборок для минификации Java байт-кода.
  */
 def enableProguardInReleaseBuilds = false
 
 /**
- * The preferred build flavor of JavaScriptCore (JSC)
+ * Предпочтительная сборка JavaScriptCore (JSC)
  *
- * For example, to use the international variant, you can use:
+ * Например, для использования интернационального варианта вы можете использовать:
  * `def jscFlavor = io.github.react-native-community:jsc-android-intl:2026004.+`
  *
- * The international variant includes ICU i18n library and necessary data
- * allowing to use e.g. `Date.toLocaleString` and `String.localeCompare` that
- * give correct results when using with locales other than en-US. Note that
- * this variant is about 6MiB larger per architecture than default.
+ * Интернациональный вариант включает библиотеку ICU i18n и необходимые данные,
+ * позволяя использовать, например, `Date.toLocaleString` и `String.localeCompare`,
+ * которые дают корректные результаты при использовании локальных настроек, отличных от en-US.
+ * Обратите внимание, что этот вариант примерно на 6 МиБ больше на архитектуру, чем стандартный.
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
@@ -85,15 +85,15 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.pocketpal"
+    namespace "com.faust.ai"                           // Изменено: новое пространство имен
     defaultConfig {
-        applicationId "com.pocketpalai"
+        applicationId "com.faust.ai"                   // Изменено: новый ID приложения
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 136 
-        versionName "1.13.3"
+        versionCode 1                                  // Изменено: начальный код версии
+        versionName "1.0.0"                            // Изменено: начальное имя версии
         ndk {
-            abiFilters "arm64-v8a", "x86_64"
+            abiFilters "arm64-v8a"                     // Изменено: только arm64-v8a
         }
     }
     signingConfigs {
@@ -104,14 +104,14 @@ android {
             keyPassword 'android'
         }
         release {
-            // Read signing credentials from .env file or environment variables
+            // Чтение учетных данных подписи из файла .env или переменных окружения
             def releaseStorePassword = project.env.get("APP_RELEASE_STORE_PASSWORD") ?: System.getenv("APP_RELEASE_STORE_PASSWORD")
             def releaseKeyPassword = project.env.get("APP_RELEASE_KEY_PASSWORD") ?: System.getenv("APP_RELEASE_KEY_PASSWORD")
 
             if (releaseStorePassword && releaseKeyPassword) {
-                storeFile file("pocketpal-release-key.keystore")
+                storeFile file("faustai-release-key.keystore")      // Изменено: новое имя файла ключа
                 storePassword releaseStorePassword
-                keyAlias "pocketpal_key_alias"
+                keyAlias "faustai_key_alias"                        // Изменено: новый алиас ключа
                 keyPassword releaseKeyPassword
             }
         }
@@ -121,15 +121,15 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            // Only use release signing config if credentials are available, otherwise use debug
+            // Осторожно! В продакшене вам нужно сгенерировать свой собственный файл keystore.
+            // см. https://reactnative.dev/docs/signed-apk-android.
+            // Используйте конфигурацию подписи релиза только если доступны учетные данные, иначе используйте debug
             if (signingConfigs.release.storeFile != null) {
                 signingConfig signingConfigs.release
             } else {
-                // Fall back to debug signing for CI builds without credentials
+                // Откат к debug подписи для CI-сборок без учетных данных
                 signingConfig signingConfigs.debug
-                println "Warning: Release signing credentials not found, using debug keystore"
+                println "Внимание: Учетные данные для подписи релиза не найдены, используется debug keystore"
             }
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
@@ -138,7 +138,7 @@ android {
 }
 
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
+    // Версия react-native устанавливается плагином React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
     if (hermesEnabled.toBoolean()) {
@@ -147,35 +147,34 @@ dependencies {
         implementation jscFlavor
     }
 
-    // The Firebase Android BoM (Bill of Materials) lets you manage all your Firebase library versions 
-    // by specifying only one version — the BoM's version.
+    // Android BoM (Bill of Materials) для Firebase позволяет управлять всеми версиями библиотек Firebase,
+    // указывая только одну версию — версию BoM.
     implementation platform('com.google.firebase:firebase-bom:34.4.0')
     implementation 'com.google.firebase:firebase-appcheck-playintegrity'
     implementation 'com.google.firebase:firebase-appcheck-debug'
 
-    // Room dependencies for DownloadModule
+    // Зависимости Room для DownloadModule
     def room_version = "2.8.2"
     implementation("androidx.room:room-runtime:$room_version")
-    // Kotlin Extensions and Coroutines support for Room
+    // Расширения Kotlin и поддержка корутин для Room
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
-    // WorkManager for DownloadModule
+    // WorkManager для DownloadModule
     implementation "androidx.work:work-runtime-ktx:2.10.5"
-    // Lifecycle for DownloadModule
+    // Lifecycle для DownloadModule
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.9.4"
-    // Coroutines for DownloadModule (wait)
-    implementation "androidx.concurrent:concurrent-futures-ktx:1.3.0" 
+    // Coroutines для DownloadModule (ожидание)
+    implementation "androidx.concurrent:concurrent-futures-ktx:1.3.0"
 
-    // Core library for AndroidX Jetpack - Needed for WindowCompat (we use for edge-to-edge)
+    // Основная библиотека для AndroidX Jetpack - Нужна для WindowCompat (используем для edge-to-edge)
     implementation "androidx.core:core-ktx:1.17.0"
 
-    // OkHttp for DownloadModule (network requests)
+    // OkHttp для DownloadModule (сетевые запросы)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 project.ext.vectoricons = [
-    iconFontNames: [ 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf'  ] // Specify font files
+    iconFontNames: [ 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf' ] // Указываем файлы шрифтов
 ]
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
-
