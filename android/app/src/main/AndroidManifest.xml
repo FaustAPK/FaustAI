@@ -1,6 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.faust.ai">
 
-    <!-- Allow app to check if any other app can handle URLs -->
+    <!-- Разрешение приложению проверять, могут ли другие приложения обрабатывать URL -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -8,12 +10,12 @@
         </intent>
     </queries>
 
-    <!-- Permissions -->
+    <!-- Разрешения -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- Needed only for devices running Android 9 (API 28) or lower -->
-    <!-- Currently used for storing chat sessions (/Download) -->
+    <!-- Необходимо только для устройств под управлением Android 9 (API 28) или ниже -->
+    <!-- В настоящее время используется для хранения сеансов чата (/Download) -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
@@ -45,12 +47,12 @@
         </intent-filter>
       </activity>
 
-        <!-- Optional native library for OpenCL (GPU acceleration) -->
+        <!-- Опциональная нативная библиотека для OpenCL (GPU ускорение) -->
         <uses-native-library
             android:name="libOpenCL.so"
             android:required="false" />
 
-        <!-- Optional native library for Hexagon DSP (NPU acceleration) -->
+        <!-- Опциональная нативная библиотека для Hexagon DSP (NPU ускорение) -->
         <uses-native-library
             android:name="libcdsprpc.so"
             android:required="false" />
