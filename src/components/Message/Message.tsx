@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Pressable, Text, View, Animated} from 'react-native';
 
 import {oneOf} from '@flyerhq/react-native-link-preview';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+// import ReactNativeHapticFeedback from 'react-native-haptic-feedback'; // Удалено
 
 import {useTheme} from '../../hooks';
 
@@ -19,10 +19,10 @@ import {
 import {MessageType} from '../../utils/types';
 import {excludeDerivedMessageProps, UserContext} from '../../utils';
 
-const hapticOptions = {
-  enableVibrateFallback: true,
-  ignoreAndroidSystemSettings: false,
-};
+// const hapticOptions = {
+//   enableVibrateFallback: true,
+//   ignoreAndroidSystemSettings: false,
+// };
 
 export interface MessageTopLevelProps extends TextMessageTopLevelProps {
   /** Called when user makes a long press on any message */
@@ -229,7 +229,7 @@ export const Message = React.memo(
         />
         <Pressable
           onLongPress={event => {
-            ReactNativeHapticFeedback.trigger('impactLight', hapticOptions);
+            // ReactNativeHapticFeedback.trigger('impactLight', hapticOptions); // Удалено
             onMessageLongPress?.(excludeDerivedMessageProps(message), event);
           }}
           onPress={event => {
