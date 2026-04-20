@@ -1,7 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "org.jetbrains.kotlin.kapt"
-apply plugin: "com.facebook.react"
+//apply plugin: "com.facebook.react"
 
 // Добавляем плагин сервисов Google Play
 // Он используется исключительно для отправки результатов бенчмарков (с согласия пользователя) в Hugging Face Spaces через Firebase.
