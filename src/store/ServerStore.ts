@@ -2,7 +2,7 @@ import {AppState, AppStateStatus} from 'react-native';
 import {makeAutoObservable, observable, runInAction} from 'mobx';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {makePersistable} from 'mobx-persist-store';
-import * as Keychain from 'react-native-keychain';
+// import * as Keychain from 'react-native-keychain'; // Удалено
 
 import {fetchModels, testConnection, RemoteModelInfo} from '../api/openai';
 import {ServerConfig} from '../utils/types';
@@ -69,8 +69,8 @@ class ServerStore {
     this.userSelectedModels = this.userSelectedModels.filter(
       m => m.serverId !== id,
     );
-    // Clean up API key from keychain
-    this.removeApiKey(id);
+    // Clean up API key from keychain (disabled)
+    // this.removeApiKey(id); // Удалено
   }
 
   addUserSelectedModel(serverId: string, remoteModelId: string): void {
@@ -113,41 +113,41 @@ class ServerStore {
     return this.userSelectedModels.filter(m => m.serverId === serverId);
   }
 
-  // API key management (Keychain)
-  async setApiKey(serverId: string, apiKey: string): Promise<void> {
-    try {
-      await Keychain.setGenericPassword('apiKey', apiKey, {
-        service: `${KEYCHAIN_SERVICE_PREFIX}${serverId}`,
-      });
-    } catch (error) {
-      console.error('Failed to save API key:', error);
-    }
-  }
+  // API key management (disabled)
+  // async setApiKey(serverId: string, apiKey: string): Promise<void> {
+  //   try {
+  //     await Keychain.setGenericPassword('apiKey', apiKey, {
+  //       service: `${KEYCHAIN_SERVICE_PREFIX}${serverId}`,
+  //     });
+  //   } catch (error) {
+  //     console.error('Failed to save API key:', error);
+  //   }
+  // }
 
-  async getApiKey(serverId: string): Promise<string | undefined> {
-    try {
-      const credentials = await Keychain.getGenericPassword({
-        service: `${KEYCHAIN_SERVICE_PREFIX}${serverId}`,
-      });
-      if (credentials) {
-        return credentials.password;
-      }
-      return undefined;
-    } catch (error) {
-      console.error('Failed to load API key:', error);
-      return undefined;
-    }
-  }
+  // async getApiKey(serverId: string): Promise<string | undefined> {
+  //   try {
+  //     const credentials = await Keychain.getGenericPassword({
+  //       service: `${KEYCHAIN_SERVICE_PREFIX}${serverId}`,
+  //     });
+  //     if (credentials) {
+  //       return credentials.password;
+  //     }
+  //     return undefined;
+  //   } catch (error) {
+  //     console.error('Failed to load API key:', error);
+  //     return undefined;
+  //   }
+  // }
 
-  async removeApiKey(serverId: string): Promise<void> {
-    try {
-      await Keychain.resetGenericPassword({
-        service: `${KEYCHAIN_SERVICE_PREFIX}${serverId}`,
-      });
-    } catch (error) {
-      console.error('Failed to remove API key:', error);
-    }
-  }
+  // async removeApiKey(serverId: string): Promise<void> {
+  //   try {
+  //     await Keychain.resetGenericPassword({
+  //       service: `${KEYCHAIN_SERVICE_PREFIX}${serverId}`,
+  //     });
+  //   } catch (error) {
+  //     console.error('Failed to remove API key:', error);
+  //   }
+  // }
 
   // Remote model fetching
   async fetchModelsForServer(serverId: string): Promise<void> {
@@ -162,8 +162,8 @@ class ServerStore {
     });
 
     try {
-      const apiKey = await this.getApiKey(serverId);
-      const models = await fetchModels(server.url, apiKey);
+      // const apiKey = await this.getApiKey(serverId); // Удалено
+      const models = await fetchModels(server.url, undefined); // apiKey removed
 
       runInAction(() => {
         this.serverModels.set(serverId, models);
@@ -203,8 +203,8 @@ class ServerStore {
       return {ok: false, modelCount: 0, error: 'Server not found'};
     }
 
-    const apiKey = await this.getApiKey(serverId);
-    return testConnection(server.url, apiKey);
+    // const apiKey = await this.getApiKey(serverId); // Удалено
+    return testConnection(server.url, undefined); // apiKey removed
   }
 
   acknowledgePrivacyNotice(): void {
