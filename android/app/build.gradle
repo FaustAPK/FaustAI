@@ -6,7 +6,7 @@ apply plugin: "com.facebook.react"
 // Добавляем плагин сервисов Google Play
 // Он используется исключительно для отправки результатов бенчмарков (с согласия пользователя) в Hugging Face Spaces через Firebase.
 // Firebase используется для функциональности App Check, позволяя неавторизованным пользователям безопасно отправлять свои данные бенчмарков.
-//apply plugin: "com.google.gms.google-services"
+// apply plugin: "com.google.gms.google-services"
 
 apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
 
