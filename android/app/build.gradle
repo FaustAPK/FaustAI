@@ -8,7 +8,7 @@ apply plugin: "com.facebook.react"
 // Firebase используется для функциональности App Check, позволяя неавторизованным пользователям безопасно отправлять свои данные бенчмарков.
 
 
-apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
+//apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
 
 /**
  * Этот блок конфигурации предназначен для кастомизации вашего React Native Android приложения.
