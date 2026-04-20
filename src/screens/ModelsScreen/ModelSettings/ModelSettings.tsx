@@ -4,7 +4,7 @@ import {View, Keyboard} from 'react-native';
 
 import {Button, Text, Switch, Chip} from 'react-native-paper';
 import LinearGradient from 'react-native-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
+// import MaskedView from '@react-native-masked-view/masked-view'; // Удалено
 
 import {Divider, TextInput} from '../../../components';
 
@@ -121,22 +121,12 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
         <Text style={styles.chatTemplateLabel} variant="labelLarge">
           {l10n.models.modelSettings.template.label}
         </Text>
-        <MaskedView
-          style={styles.chatTemplateContainer}
-          maskElement={
-            <View style={styles.chatTemplateMaskContainer}>
-              <Text variant="labelSmall">
-                {chatTemplate.chatTemplate.trim().slice(0, 30)}
-              </Text>
-            </View>
-          }>
-          <LinearGradient
-            colors={[theme.colors.onSurface, 'transparent']}
-            style={styles.chatTemplatePreviewGradient}
-            start={{x: 0.7, y: 0}}
-            end={{x: 1, y: 0}}
-          />
-        </MaskedView>
+        {/* Временно используем View вместо MaskedView */}
+        <View style={styles.chatTemplateContainer}>
+          <Text variant="labelSmall">
+            {chatTemplate.chatTemplate.trim().slice(0, 30)}
+          </Text>
+        </View>
         <Button
           onPress={() => {
             setLocalChatTemplate(chatTemplate.chatTemplate);
