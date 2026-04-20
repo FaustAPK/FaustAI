@@ -12,7 +12,7 @@ import {
 
 import {Text} from 'react-native-paper';
 import LinearGradient from 'react-native-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
+// import MaskedView from '@react-native-masked-view/masked-view'; // Удалено
 import {ChevronDownIcon} from '../../assets/icons';
 
 import {useTheme} from '../../hooks';
@@ -290,23 +290,8 @@ export const ThinkingBubble: React.FC<ThinkingBubbleProps> = ({children}) => {
                 {children}
               </ScrollView>
             ) : isScrollable ? (
-              // Use MaskedView only when not animating from collapsed to partial
-              <MaskedView
-                testID="masked-view"
-                style={styles.maskedContentContainer}
-                maskElement={
-                  <View style={styles.maskElementContainer}>
-                    {/* This gradient is used as a mask - transparent areas will be see-through */}
-                    <LinearGradient
-                      style={styles.maskGradient}
-                      colors={['transparent', 'black']}
-                      pointerEvents="none"
-                    />
-                    {/* Solid black below the gradient ensures the rest of the content is fully visible */}
-                    <View style={styles.maskSolid} />
-                  </View>
-                }>
-                {/* The actual content that will be masked */}
+              // Временно используем View вместо MaskedView
+              <View style={styles.maskedContentContainer}>
                 <ScrollView
                   ref={scrollViewRef}
                   style={styles.contentContainer}
@@ -316,7 +301,7 @@ export const ThinkingBubble: React.FC<ThinkingBubbleProps> = ({children}) => {
                   }>
                   {children}
                 </ScrollView>
-              </MaskedView>
+              </View>
             ) : (
               <View style={styles.contentContainer}>{children}</View>
             )}
