@@ -110,7 +110,7 @@
     "typescript": "5.0.4"
   },
   "engines": {
-    "node": ">=22.21.0"
+    "node": ">=18.0.0"
   },
   "packageManager": "yarn@1.22.22",
   "codegenConfig": {
