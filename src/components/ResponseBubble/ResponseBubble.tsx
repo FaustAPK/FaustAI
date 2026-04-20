@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import LinearGradient from 'react-native-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
+// import MaskedView from '@react-native-masked-view/masked-view'; // Удалено
 import {createStyles} from './styles';
 
 // Enable LayoutAnimation for Android
@@ -37,8 +37,6 @@ export const ResponseBubble: React.FC<ResponseBubbleProps> = ({children}) => {
   const [bubbleState, setBubbleState] = useState<BubbleState>(
     BubbleState.EXPANDED,
   );
-
-  // We don't need to track animation state anymore
 
   const chevronRotation = useRef(new Animated.Value(0)).current;
 
@@ -112,46 +110,19 @@ export const ResponseBubble: React.FC<ResponseBubbleProps> = ({children}) => {
       <View style={containerStyle}>
         {/* Content */}
         {isScrollable ? (
-          // Use MaskedView for partial state
-          <MaskedView
-            testID="masked-view"
-            style={styles.maskedContentContainer}
-            maskElement={
-              <View style={styles.maskElementContainer}>
-                <LinearGradient
-                  style={styles.maskGradient}
-                  colors={['transparent', 'black']}
-                  pointerEvents="none"
-                />
-                <View style={styles.maskSolid} />
-              </View>
-            }>
-            {/* The actual content that will be masked */}
+          // Временно используем View вместо MaskedView
+          <View style={styles.maskedContentContainer}>
             <ScrollView
               ref={scrollViewRef}
               style={styles.contentContainer}
               contentContainerStyle={styles.contentContainerStyle}
               showsVerticalScrollIndicator={false}
-              // scrollEventThrottle={16}
               onContentSizeChange={() =>
                 scrollViewRef.current?.scrollToEnd({animated: true})
-              }
-              // onLayout={() => {
-              //   // Scroll when layout changes
-              //   scrollViewRef.current?.scrollToEnd({animated: false});
-              // }}
-              // onContentSizeChange={() => {
-              //   // First scroll without animation to ensure we reach the end
-              //   scrollViewRef.current?.scrollToEnd({animated: false});
-              //   // Then add a slight delay and scroll with animation for a smoother experience
-              //   setTimeout(() => {
-              //     scrollViewRef.current?.scrollToEnd({animated: true});
-              //   }, 50);
-              // }}
-            >
+              }>
               {children}
             </ScrollView>
-          </MaskedView>
+          </View>
         ) : (
           // Full content view for expanded state
           <ScrollView
