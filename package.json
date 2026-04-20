@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "prepare": "husky",
-    "postinstall": "./scripts/postinstall.sh",
+    //"prepare": "husky",
+    //"postinstall": "./scripts/postinstall.sh",
     "android": "react-native run-android",
     "build:android": "cd android && ./gradlew assembleDebug && cd ..",
     "build:android:release": "cd android && ./gradlew bundleRelease && cd ..",
