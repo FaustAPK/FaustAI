@@ -1,7 +1,7 @@
 import {Platform, Alert} from 'react-native';
 
 import {format} from 'date-fns';
-import Share from 'react-native-share';
+// import Share from 'react-native-share'; // Удалено
 import * as RNFS from '@dr.pogodin/react-native-fs';
 
 import {chatSessionRepository} from '../repositories/ChatSessionRepository';
@@ -10,6 +10,7 @@ import {uiStore, palStore} from '../store';
 import {ensureLegacyStoragePermission} from './androidPermission';
 import {getAbsoluteThumbnailPath, isLocalThumbnailPath} from './imageUtils';
 import type {Pal} from '../types/pal';
+
 /**
  * Export a single chat session to a JSON file
  * @param sessionId The ID of the session to export
@@ -271,47 +272,41 @@ const shareJsonData = async (
     const tempFilePath = `${RNFS.CachesDirectoryPath}/${filename}`;
     await RNFS.writeFile(tempFilePath, jsonData, 'utf8');
 
-    // Share the file
+    // Share the file (simplified version without react-native-share)
     if (Platform.OS === 'ios') {
-      // On iOS, use react-native-share
-      await Share.open({
-        url: `file://${tempFilePath}`,
-        title: `Share ${filename}`,
-        type: 'application/json',
-        failOnCancel: false,
-      });
+      // On iOS, show alert with file path
+      Alert.alert(
+        currentL10n.components.exportUtils.fileSaved,
+        currentL10n.components.exportUtils.fileSavedMessage.replace(
+          '{{filename}}',
+          filename,
+        ),
+        [{text: currentL10n.components.exportUtils.ok}],
+      );
     } else if (Platform.OS === 'android' && Platform.Version === 29) {
       // Special handling for Android 10 (API 29)
-      // Use direct sharing from temp directory instead of saving to Downloads
-      try {
-        await Share.open({
-          url: `file://${tempFilePath}`,
-          title: `Share ${filename}`,
-          type: 'application/json',
-          failOnCancel: false,
-        });
-        return; // Exit early after sharing
-      } catch (error) {
-        console.error('Error sharing on Android 10:', error);
-        throw error;
-      }
+      Alert.alert(
+        currentL10n.components.exportUtils.fileSaved,
+        currentL10n.components.exportUtils.fileSavedMessage.replace(
+          '{{filename}}',
+          tempFilePath,
+        ),
+        [{text: currentL10n.components.exportUtils.ok}],
+      );
     } else {
       // On Android (not API 29), handle with storage permissions
       const permissionGranted = await ensureLegacyStoragePermission();
       if (!permissionGranted) {
-        // If permission denied, fall back to direct sharing
-        try {
-          await Share.open({
-            url: `file://${tempFilePath}`,
-            title: `Share ${filename}`,
-            type: 'application/json',
-            failOnCancel: false,
-          });
-          return; // Exit early after sharing
-        } catch (error) {
-          console.error('Error sharing after permission denied:', error);
-          throw error;
-        }
+        // If permission denied, fall back to showing file path
+        Alert.alert(
+          currentL10n.components.exportUtils.fileSaved,
+          currentL10n.components.exportUtils.fileSavedMessage.replace(
+            '{{filename}}',
+            tempFilePath,
+          ),
+          [{text: currentL10n.components.exportUtils.ok}],
+        );
+        return;
       }
 
       try {
@@ -332,86 +327,21 @@ const shareJsonData = async (
           fileSavedMsg,
           [
             {
-              text: currentL10n.components.exportUtils.share,
-              onPress: async () => {
-                // Use react-native-share for both platforms
-                try {
-                  const options = {
-                    title: `Share ${filename}`,
-                    message: 'PocketPal AI Chat Export',
-                    url: `file://${savePath}`,
-                    type: 'application/json',
-                    failOnCancel: false,
-                  };
-
-                  await Share.open(options);
-                } catch (error) {
-                  const shareError = error as any;
-                  console.error('Error sharing file:', shareError);
-
-                  // Fallback to sharing content directly if file sharing fails
-                  if (shareError.message !== 'User did not share') {
-                    try {
-                      await Share.open({
-                        title: `Share ${filename}`,
-                        message: jsonData,
-                      });
-                    } catch (err) {
-                      const fallbackError = err as any;
-                      console.error(
-                        'Error with fallback sharing:',
-                        fallbackError,
-                      );
-                      // Ignore cancellation errors
-                      if (fallbackError.message !== 'User did not share') {
-                        Alert.alert(
-                          currentL10n.components.exportUtils.shareError,
-                          currentL10n.components.exportUtils.shareErrorMessage,
-                          [{text: currentL10n.components.exportUtils.ok}],
-                        );
-                      }
-                    }
-                  }
-                }
-              },
+              text: currentL10n.components.exportUtils.ok,
             },
-            {text: currentL10n.components.exportUtils.ok},
           ],
         );
       } catch (error) {
         console.error('Error saving to Downloads:', error);
 
-        // Fallback to just sharing the file content
+        // Fallback to showing file path
         Alert.alert(
-          currentL10n.components.exportUtils.saveOptions,
-          currentL10n.components.exportUtils.saveOptionsMessage,
-          [
-            {
-              text: currentL10n.components.exportUtils.share,
-              onPress: async () => {
-                // For fallback, share the file content directly
-                try {
-                  await Share.open({
-                    title: `Share ${filename}`,
-                    message: jsonData,
-                  });
-                } catch (err) {
-                  const shareError = err as any;
-                  console.error('Error sharing content:', shareError);
-                  // Ignore cancellation errors
-                  if (shareError.message !== 'User did not share') {
-                    Alert.alert(
-                      currentL10n.components.exportUtils.shareError,
-                      currentL10n.components.exportUtils
-                        .shareContentErrorMessage,
-                      [{text: currentL10n.components.exportUtils.ok}],
-                    );
-                  }
-                }
-              },
-            },
-            {text: currentL10n.components.exportUtils.cancel},
-          ],
+          currentL10n.components.exportUtils.fileSaved,
+          currentL10n.components.exportUtils.fileSavedMessage.replace(
+            '{{filename}}',
+            tempFilePath,
+          ),
+          [{text: currentL10n.components.exportUtils.ok}],
         );
       }
     }
