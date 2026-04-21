@@ -7,14 +7,7 @@ apply plugin: "com.facebook.react"
 // Он используется исключительно для отправки результатов бенчмарков (с согласия пользователя) в Hugging Face Spaces через Firebase.
 // Firebase используется для функциональности App Check, позволяя неавторизованным пользователям безопасно отправлять свои данные бенчмарков.
 
-
-//apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
-
-/**
- * Этот блок конфигурации предназначен для кастомизации вашего React Native Android приложения.
- * По умолчанию вам не нужно применять никакой конфигурации, просто раскомментируйте нужные строки.
- */
-
+// apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
 
 /**
  * Установите значение true, чтобы запустить Proguard для релизных сборок для минификации Java байт-кода.
@@ -39,17 +32,18 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.faust.ai"                           // Изменено: новое пространство имен
+    namespace "com.faust.ai"
     defaultConfig {
-        applicationId "com.faust.ai"                   // Изменено: новый ID приложения
+        applicationId "com.faust.ai"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1                                  // Изменено: начальный код версии
-        versionName "1.0.0"                            // Изменено: начальное имя версии
+        versionCode 1
+        versionName "1.0.0"
         ndk {
-            abiFilters "arm64-v8a"                     // Изменено: только arm64-v8a
+            abiFilters "arm64-v8a"
         }
     }
+    
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -57,22 +51,20 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        
+        release {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+    
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Осторожно! В продакшене вам нужно сгенерировать свой собственный файл keystore.
-            // см. https://reactnative.dev/docs/signed-apk-android.
-            // Используйте конфигурацию подписи релиза только если доступны учетные данные, иначе используйте debug
-            if (signingConfigs.release.storeFile != null) {
-                signingConfig signingConfigs.release
-            } else {
-                // Откат к debug подписи для CI-сборок без учетных данных
-                signingConfig signingConfigs.debug
-                println "Внимание: Учетные данные для подписи релиза не найдены, используется debug keystore"
-            }
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -80,7 +72,6 @@ android {
 }
 
 dependencies {
-    // Версия react-native устанавливается плагином React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 
     if (hermesEnabled.toBoolean()) {
@@ -89,34 +80,21 @@ dependencies {
         implementation jscFlavor
     }
 
-    // Android BoM (Bill of Materials) для Firebase позволяет управлять всеми версиями библиотек Firebase,
-    // указывая только одну версию — версию BoM.
-    //implementation platform('com.google.firebase:firebase-bom:34.4.0')
-    //implementation 'com.google.firebase:firebase-appcheck-playintegrity'
-    //implementation 'com.google.firebase:firebase-appcheck-debug'
-
     // Зависимости Room для DownloadModule
     def room_version = "2.8.2"
     implementation("androidx.room:room-runtime:$room_version")
-    // Расширения Kotlin и поддержка корутин для Room
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
-    // WorkManager для DownloadModule
     implementation "androidx.work:work-runtime-ktx:2.10.5"
-    // Lifecycle для DownloadModule
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.9.4"
-    // Coroutines для DownloadModule (ожидание)
     implementation "androidx.concurrent:concurrent-futures-ktx:1.3.0"
 
-    // Основная библиотека для AndroidX Jetpack - Нужна для WindowCompat (используем для edge-to-edge)
     implementation "androidx.core:core-ktx:1.17.0"
-
-    // OkHttp для DownloadModule (сетевые запросы)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
 
 project.ext.vectoricons = [
-    iconFontNames: [ 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf' ] // Указываем файлы шрифтов
+    iconFontNames: [ 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf' ]
 ]
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
