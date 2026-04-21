@@ -15,16 +15,22 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Clean node_modules and reinstall
+      - name: Clean npm cache and reinstall
         run: |
           rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
+
+      - name: Clean Gradle cache
+        run: |
+          cd android
+          ./gradlew clean
+          rm -rf .gradle
 
       - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
