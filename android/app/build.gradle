@@ -57,19 +57,7 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            // Чтение учетных данных подписи из файла .env или переменных окружения
-            def releaseStorePassword = project.env.get("APP_RELEASE_STORE_PASSWORD") ?: System.getenv("APP_RELEASE_STORE_PASSWORD")
-            def releaseKeyPassword = project.env.get("APP_RELEASE_KEY_PASSWORD") ?: System.getenv("APP_RELEASE_KEY_PASSWORD")
-
-            if (releaseStorePassword && releaseKeyPassword) {
-                storeFile file("faustai-release-key.keystore")      // Изменено: новое имя файла ключа
-                storePassword releaseStorePassword
-                keyAlias "faustai_key_alias"                        // Изменено: новый алиас ключа
-                keyPassword releaseKeyPassword
-            }
-        }
-    }
+        
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
