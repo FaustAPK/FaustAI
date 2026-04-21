@@ -20,12 +20,13 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
 
-      - name: Clean Gradle cache (full)
+      - name: Clean Gradle cache (force)
         run: |
           rm -rf ~/.gradle/caches/
           cd android
           ./gradlew clean
           rm -rf .gradle
+          rm -rf app/build
 
       - name: Build Android APK
         run: |
