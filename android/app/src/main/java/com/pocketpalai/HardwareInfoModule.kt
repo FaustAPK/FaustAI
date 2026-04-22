@@ -104,8 +104,64 @@ class HardwareInfoModule(reactContext: ReactApplicationContext) : ReactContextBa
 
     @ReactMethod
     fun getCPUInfo(promise: Promise) {
-        // (оставь существующую реализацию, она не зависит от specs)
-        // ...
+        try {
+            val cpuInfo = Arguments.createMap()
+            cpuInfo.putInt("cores", Runtime.getRuntime().availableProcessors())
+
+            val processors = Arguments.createArray()
+            val features = mutableSetOf<String>()
+            val cpuInfoFile = File("/proc/cpuinfo")
+
+            if (cpuInfoFile.exists()) {
+                val cpuInfoLines = cpuInfoFile.readLines()
+                var currentProcessor = Arguments.createMap()
+                var hasData = false
+
+                for (line in cpuInfoLines) {
+                    if (line.isEmpty() && hasData) {
+                        processors.pushMap(currentProcessor)
+                        currentProcessor = Arguments.createMap()
+                        hasData = false
+                        continue
+                    }
+                    val parts = line.split(":")
+                    if (parts.size >= 2) {
+                        val key = parts[0].trim()
+                        val value = parts[1].trim()
+                        when (key) {
+                            "processor", "model name", "cpu MHz", "vendor_id" -> {
+                                currentProcessor.putString(key, value)
+                                hasData = true
+                            }
+                            "flags", "Features" -> {
+                                features.addAll(value.split(" ").filter { it.isNotEmpty() })
+                            }
+                        }
+                    }
+                }
+                if (hasData) {
+                    processors.pushMap(currentProcessor)
+                }
+                cpuInfo.putArray("processors", processors)
+
+                val featuresArray = Arguments.createArray()
+                features.forEach { featuresArray.pushString(it) }
+                cpuInfo.putArray("features", featuresArray)
+
+                cpuInfo.putBoolean("hasFp16", features.any { it in setOf("fphp", "fp16") })
+                cpuInfo.putBoolean("hasDotProd", features.any { it in setOf("dotprod", "asimddp") })
+                cpuInfo.putBoolean("hasSve", features.any { it == "sve" })
+                cpuInfo.putBoolean("hasI8mm", features.any { it == "i8mm" })
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                cpuInfo.putString("socModel", Build.SOC_MODEL)
+            }
+
+            promise.resolve(cpuInfo)
+        } catch (e: Exception) {
+            promise.reject("ERROR", e.message)
+        }
     }
 
     @ReactMethod
@@ -122,7 +178,35 @@ class HardwareInfoModule(reactContext: ReactApplicationContext) : ReactContextBa
 
     @ReactMethod
     fun writeMemorySnapshot(label: String, promise: Promise) {
-        // (оставь существующую реализацию)
-        // ...
+        try {
+            val pssKb = Debug.getPss()
+            val nativeHeap = Debug.getNativeHeapAllocatedSize()
+            val activityManager = reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memInfo = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memInfo)
+
+            val snapshot = JSONObject().apply {
+                put("label", label)
+                put("timestamp", java.time.Instant.now().toString())
+                put("native", JSONObject().apply {
+                    put("pss_total", pssKb * 1024.0)
+                    put("native_heap_allocated", nativeHeap.toDouble())
+                    put("available_memory", memInfo.availMem.toDouble())
+                })
+            }
+
+            val dir = reactApplicationContext.getExternalFilesDir(null) ?: reactApplicationContext.filesDir
+            val file = File(dir, "memory-snapshots.json")
+            val snapshots = if (file.exists()) JSONArray(file.readText()) else JSONArray()
+            snapshots.put(snapshot)
+            file.writeText(snapshots.toString(2))
+
+            promise.resolve(Arguments.createMap().apply {
+                putString("label", label)
+                putString("status", "written")
+            })
+        } catch (e: Exception) {
+            promise.reject("ERROR", e.message)
+        }
     }
 }
