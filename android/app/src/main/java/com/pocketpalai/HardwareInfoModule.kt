@@ -1,8 +1,6 @@
 package com.pocketpal
 
 import com.facebook.react.bridge.*
-import com.facebook.react.module.annotations.ReactModule
-import com.pocketpal.specs.NativeHardwareInfoSpec
 import android.os.Build
 import android.os.Debug
 import java.io.File
@@ -17,242 +15,114 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 
-@ReactModule(name = NativeHardwareInfoSpec.NAME)
-class HardwareInfoModule(reactContext: ReactApplicationContext) :
-    NativeHardwareInfoSpec(reactContext) {
+class HardwareInfoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-  override fun getName(): String = NativeHardwareInfoSpec.NAME
+    override fun getName(): String = "HardwareInfo"
 
-  override fun getChipset(promise: Promise) {
-    try {
-      // Prefer SOC_MODEL (Android S+) for more specific chipset info
-      val chipset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        Build.SOC_MODEL.takeUnless { it.isNullOrEmpty() }
-          ?: Build.HARDWARE.takeUnless { it.isNullOrEmpty() }
-          ?: Build.BOARD
-      } else {
-        Build.HARDWARE.takeUnless { it.isNullOrEmpty() } ?: Build.BOARD
-      }
-      promise.resolve(chipset)
-    } catch (e: Exception) {
-      promise.reject("ERROR", e.message)
-    }
-  }
-
-  override fun getGPUInfo(promise: Promise) {
-    try {
-      val gpuInfo = Arguments.createMap()
-
-      // Get GPU renderer info
-      var renderer = ""
-      var vendor = ""
-      var version = ""
-
-      try {
-        val egl = EGLContext.getEGL() as EGL10
-        val display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
-
-        if (display != EGL10.EGL_NO_DISPLAY) {
-          val version_array = IntArray(2)
-          egl.eglInitialize(display, version_array)
-
-          val configsCount = IntArray(1)
-          val configs = arrayOfNulls<EGLConfig>(1)
-          val configSpec = intArrayOf(
-            EGL10.EGL_RENDERABLE_TYPE, 4,
-            EGL10.EGL_NONE
-          )
-
-          egl.eglChooseConfig(display, configSpec, configs, 1, configsCount)
-
-          if (configsCount[0] > 0) {
-            val context = egl.eglCreateContext(
-              display,
-              configs[0],
-              EGL10.EGL_NO_CONTEXT,
-              intArrayOf(0x3098, 2, EGL10.EGL_NONE)
-            )
-
-            if (context != null && context != EGL10.EGL_NO_CONTEXT) {
-              val surfaceAttribs = intArrayOf(
-                EGL10.EGL_WIDTH, 1,
-                EGL10.EGL_HEIGHT, 1,
-                EGL10.EGL_NONE
-              )
-              val surface = egl.eglCreatePbufferSurface(display, configs[0], surfaceAttribs)
-
-              if (surface != null && surface != EGL10.EGL_NO_SURFACE) {
-                egl.eglMakeCurrent(display, surface, surface, context)
-
-                renderer = GLES20.glGetString(GLES20.GL_RENDERER) ?: ""
-                vendor = GLES20.glGetString(GLES20.GL_VENDOR) ?: ""
-                version = GLES20.glGetString(GLES20.GL_VERSION) ?: ""
-
-                egl.eglMakeCurrent(display, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT)
-                egl.eglDestroySurface(display, surface)
-              }
-              egl.eglDestroyContext(display, context)
+    @ReactMethod
+    fun getChipset(promise: Promise) {
+        try {
+            val chipset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Build.SOC_MODEL.takeUnless { it.isNullOrEmpty() }
+                    ?: Build.HARDWARE.takeUnless { it.isNullOrEmpty() }
+                    ?: Build.BOARD
+            } else {
+                Build.HARDWARE.takeUnless { it.isNullOrEmpty() } ?: Build.BOARD
             }
-          }
-          egl.eglTerminate(display)
+            promise.resolve(chipset)
+        } catch (e: Exception) {
+            promise.reject("ERROR", e.message)
         }
-      } catch (e: Exception) {
-        // Fallback: GPU info not available
-      }
-
-      gpuInfo.putString("renderer", renderer)
-      gpuInfo.putString("vendor", vendor)
-      gpuInfo.putString("version", version)
-
-      // Detect GPU type based on renderer string
-      val rendererLower = renderer.lowercase()
-      val hasAdreno = Pattern.compile("(adreno|qcom|qualcomm)").matcher(rendererLower).find()
-      val hasMali = Pattern.compile("mali").matcher(rendererLower).find()
-      val hasPowerVR = Pattern.compile("powervr").matcher(rendererLower).find()
-
-      gpuInfo.putBoolean("hasAdreno", hasAdreno)
-      gpuInfo.putBoolean("hasMali", hasMali)
-      gpuInfo.putBoolean("hasPowerVR", hasPowerVR)
-
-      // Note: OpenCL support requires Adreno GPU AND both i8mm and dotprod CPU features
-      // This is a requirement from llama.rn builds
-      // The actual check is done in JavaScript by combining GPU info with CPU info
-      gpuInfo.putBoolean("supportsOpenCL", hasAdreno) // Partial check - CPU features checked separately
-
-      // Determine GPU type string
-      val gpuType = when {
-        hasAdreno -> "Adreno (Qualcomm)"
-        hasMali -> "Mali (ARM)"
-        hasPowerVR -> "PowerVR (Imagination)"
-        renderer.isNotEmpty() -> renderer
-        else -> "Unknown"
-      }
-      gpuInfo.putString("gpuType", gpuType)
-
-      promise.resolve(gpuInfo)
-    } catch (e: Exception) {
-      promise.reject("ERROR", e.message)
     }
-  }
 
-  override fun getCPUInfo(promise: Promise) {
-    try {
-      val cpuInfo = Arguments.createMap()
-      cpuInfo.putInt("cores", Runtime.getRuntime().availableProcessors())
+    @ReactMethod
+    fun getGPUInfo(promise: Promise) {
+        try {
+            val gpuInfo = Arguments.createMap()
+            var renderer = ""
+            var vendor = ""
+            var version = ""
 
-      val processors = Arguments.createArray()
-      val features = mutableSetOf<String>()
-      val cpuInfoFile = File("/proc/cpuinfo")
+            try {
+                val egl = EGLContext.getEGL() as EGL10
+                val display = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
+                if (display != EGL10.EGL_NO_DISPLAY) {
+                    val version_array = IntArray(2)
+                    egl.eglInitialize(display, version_array)
+                    val configsCount = IntArray(1)
+                    val configs = arrayOfNulls<EGLConfig>(1)
+                    val configSpec = intArrayOf(EGL10.EGL_RENDERABLE_TYPE, 4, EGL10.EGL_NONE)
+                    egl.eglChooseConfig(display, configSpec, configs, 1, configsCount)
+                    if (configsCount[0] > 0) {
+                        val context = egl.eglCreateContext(display, configs[0], EGL10.EGL_NO_CONTEXT, intArrayOf(0x3098, 2, EGL10.EGL_NONE))
+                        if (context != null && context != EGL10.EGL_NO_CONTEXT) {
+                            val surfaceAttribs = intArrayOf(EGL10.EGL_WIDTH, 1, EGL10.EGL_HEIGHT, 1, EGL10.EGL_NONE)
+                            val surface = egl.eglCreatePbufferSurface(display, configs[0], surfaceAttribs)
+                            if (surface != null && surface != EGL10.EGL_NO_SURFACE) {
+                                egl.eglMakeCurrent(display, surface, surface, context)
+                                renderer = GLES20.glGetString(GLES20.GL_RENDERER) ?: ""
+                                vendor = GLES20.glGetString(GLES20.GL_VENDOR) ?: ""
+                                version = GLES20.glGetString(GLES20.GL_VERSION) ?: ""
+                                egl.eglMakeCurrent(display, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT)
+                                egl.eglDestroySurface(display, surface)
+                            }
+                            egl.eglDestroyContext(display, context)
+                        }
+                    }
+                    egl.eglTerminate(display)
+                }
+            } catch (e: Exception) { }
 
-      if (cpuInfoFile.exists()) {
-        val cpuInfoLines = cpuInfoFile.readLines()
-        var currentProcessor = Arguments.createMap()
-        var hasData = false
+            gpuInfo.putString("renderer", renderer)
+            gpuInfo.putString("vendor", vendor)
+            gpuInfo.putString("version", version)
 
-        for (line in cpuInfoLines) {
-          if (line.isEmpty() && hasData) {
-            processors.pushMap(currentProcessor)
-            currentProcessor = Arguments.createMap()
-            hasData = false
-            continue
-          }
+            val rendererLower = renderer.lowercase()
+            val hasAdreno = Pattern.compile("(adreno|qcom|qualcomm)").matcher(rendererLower).find()
+            val hasMali = Pattern.compile("mali").matcher(rendererLower).find()
+            val hasPowerVR = Pattern.compile("powervr").matcher(rendererLower).find()
 
-          val parts = line.split(":")
-          if (parts.size >= 2) {
-            val key = parts[0].trim()
-            val value = parts[1].trim()
-            when (key) {
-              "processor", "model name", "cpu MHz", "vendor_id" -> {
-                currentProcessor.putString(key, value)
-                hasData = true
-              }
-              "flags", "Features" -> {  // "flags" for x86, "Features" for ARM
-                features.addAll(value.split(" ").filter { it.isNotEmpty() })
-              }
+            gpuInfo.putBoolean("hasAdreno", hasAdreno)
+            gpuInfo.putBoolean("hasMali", hasMali)
+            gpuInfo.putBoolean("hasPowerVR", hasPowerVR)
+            gpuInfo.putBoolean("supportsOpenCL", hasAdreno)
+
+            val gpuType = when {
+                hasAdreno -> "Adreno (Qualcomm)"
+                hasMali -> "Mali (ARM)"
+                hasPowerVR -> "PowerVR (Imagination)"
+                renderer.isNotEmpty() -> renderer
+                else -> "Unknown"
             }
-          }
+            gpuInfo.putString("gpuType", gpuType)
+
+            promise.resolve(gpuInfo)
+        } catch (e: Exception) {
+            promise.reject("ERROR", e.message)
         }
+    }
 
-        if (hasData) {
-          processors.pushMap(currentProcessor)
+    @ReactMethod
+    fun getCPUInfo(promise: Promise) {
+        // (оставь существующую реализацию, она не зависит от specs)
+        // ...
+    }
+
+    @ReactMethod
+    fun getAvailableMemory(promise: Promise) {
+        try {
+            val activityManager = reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memInfo = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memInfo)
+            promise.resolve(memInfo.availMem.toDouble())
+        } catch (e: Exception) {
+            promise.reject("ERROR", e.message)
         }
-
-        cpuInfo.putArray("processors", processors)
-
-        // Convert features set to array
-        val featuresArray = Arguments.createArray()
-        features.forEach { featuresArray.pushString(it) }
-        cpuInfo.putArray("features", featuresArray)
-
-        // ML-related CPU features detection
-        cpuInfo.putBoolean("hasFp16", features.any { it in setOf("fphp", "fp16") })
-        cpuInfo.putBoolean("hasDotProd", features.any { it in setOf("dotprod", "asimddp") })
-        cpuInfo.putBoolean("hasSve", features.any { it == "sve" })
-        cpuInfo.putBoolean("hasI8mm", features.any { it == "i8mm" })
-      }
-
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        cpuInfo.putString("socModel", Build.SOC_MODEL)
-      }
-
-      promise.resolve(cpuInfo)
-    } catch (e: Exception) {
-      promise.reject("ERROR", e.message)
     }
-  }
 
-  override fun getAvailableMemory(promise: Promise) {
-    try {
-      val activityManager = reactApplicationContext
-        .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-      val memInfo = ActivityManager.MemoryInfo()
-      activityManager.getMemoryInfo(memInfo)
-
-      // availMem is already in bytes
-      promise.resolve(memInfo.availMem.toDouble())
-    } catch (e: Exception) {
-      promise.reject("ERROR", e.message)
+    @ReactMethod
+    fun writeMemorySnapshot(label: String, promise: Promise) {
+        // (оставь существующую реализацию)
+        // ...
     }
-  }
-
-  override fun writeMemorySnapshot(label: String, promise: Promise) {
-    try {
-      // Collect memory metrics
-      val pssKb = Debug.getPss()
-      val nativeHeap = Debug.getNativeHeapAllocatedSize()
-      val activityManager = reactApplicationContext
-          .getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-      val memInfo = ActivityManager.MemoryInfo()
-      activityManager.getMemoryInfo(memInfo)
-
-      val snapshot = JSONObject().apply {
-        put("label", label)
-        put("timestamp", java.time.Instant.now().toString())
-        put("native", JSONObject().apply {
-          put("pss_total", pssKb * 1024.0)
-          put("native_heap_allocated", nativeHeap.toDouble())
-          put("available_memory", memInfo.availMem.toDouble())
-        })
-      }
-
-      // Write to external files dir so adb pull works without root on real devices
-      val dir = reactApplicationContext.getExternalFilesDir(null) ?: reactApplicationContext.filesDir
-      val file = File(dir, "memory-snapshots.json")
-      val snapshots = if (file.exists()) {
-        JSONArray(file.readText())
-      } else {
-        JSONArray()
-      }
-      snapshots.put(snapshot)
-      file.writeText(snapshots.toString(2))
-
-      promise.resolve(Arguments.createMap().apply {
-        putString("label", label)
-        putString("status", "written")
-      })
-    } catch (e: Exception) {
-      promise.reject("ERROR", e.message)
-    }
-  }
 }
-
