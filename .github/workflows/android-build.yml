@@ -7,33 +7,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      
+      - name: Clean old java files
+        run: |
+          rm -rf android/app/src/main/java/com/pocketpalai
+          rm -rf android/app/src/main/java/com/pocketpal
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-
-      - name: Clean npm cache and reinstall
+          
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        
+      - name: Clean Gradle cache
         run: |
-          rm -rf node_modules package-lock.json
-          npm install --legacy-peer-deps
-
-      - name: Clean Gradle cache (force)
-        run: |
-          rm -rf ~/.gradle/caches/
           cd android
           ./gradlew clean
           rm -rf .gradle
-          rm -rf app/build
-
-      - name: Build Android APK
+          
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
-
+          ./gradlew assembleDebug --no-daemon
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
